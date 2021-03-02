@@ -21,6 +21,7 @@ class MSToGuerillaWorker(QThread):
 
     def __init__(self, parent=None):
         super(MSToGuerillaWorker, self).__init__(parent)
+        self.status.emit("Inactive")
 
 
     def process_data(self, data):
@@ -75,13 +76,15 @@ class MSToGuerillaWorker(QThread):
         time.sleep(0.1)
 
         try:
-            msg = Logger.message("Waiting for Bridge export")
-            self.log.emit(msg)
-            
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.bind((host, port))
 
             while True:
+                msg = Logger.message("Waiting for Bridge export")
+                self.log.emit(msg)
+                
+                self.status.emit("Active")
+
                 sock.listen(5)
                 client, addr = sock.accept()
                 data = ""
@@ -89,7 +92,8 @@ class MSToGuerillaWorker(QThread):
                 data = client.recv(size)
 
                 if data != "":
-                    Logger.message("Receiving data")
+                    msg = Logger.message("Receiving data")
+                    self.log.emit(msg)
                     self.TotalData = b""
                     self.TotalData += data
 
@@ -99,10 +103,11 @@ class MSToGuerillaWorker(QThread):
                         if data : self.TotalData += data
                         else: break
 
-                    Logger.message("Received data")
+                    msg = Logger.message("Received data")
+                    self.log.emit(msg)
                     self.import_data(self.TotalData)
                     self.finished.emit()
-                    break
+                    # break
 
         except:
             pass

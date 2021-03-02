@@ -12,7 +12,7 @@ class Logger():
         current_time = now.strftime("%H:%M:%S")
 
         msg = "%s [INFO] : " % current_time + input
-        sys.stdout.write(msg)
+        sys.stdout.write(msg + "\n")
 
         return msg
 
@@ -23,7 +23,7 @@ class Logger():
         current_time = now.strftime("%H:%M:%S")
 
         msg = "%s [WARNING] : " % current_time + input
-        sys.stdout.write(msg)
+        sys.stdout.write(msg + "\n")
 
         return msg
 
@@ -34,7 +34,7 @@ class Logger():
         current_time = now.strftime("%H:%M:%S")
 
         msg = "%s [ERROR] : " % current_time + input
-        sys.stdout.write(msg)
+        sys.stdout.write(msg + "\n")
 
         return msg
 
