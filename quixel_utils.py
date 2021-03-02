@@ -58,7 +58,8 @@ def load_quixel_folders(megascans_path):
 
 
 def load_textures(folder_path):
-
+    # Load all textures from a directory
+    # into a dict with maps types and paths
     tex_dict = {
         "Albedo" : "",
         "Bump" : "",

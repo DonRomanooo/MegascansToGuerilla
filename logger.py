@@ -11,7 +11,10 @@ class Logger():
         now = datetime.now()
         current_time = now.strftime("%H:%M:%S")
 
-        print "%s [INFO] : " % current_time + input
+        msg = "%s [INFO] : " % current_time + input
+        sys.stdout.write(msg)
+
+        return msg
 
     @staticmethod
     def warning(input):
@@ -19,7 +22,10 @@ class Logger():
         now = datetime.now()
         current_time = now.strftime("%H:%M:%S")
 
-        print "%s [WARNING] : " % current_time + input
+        msg = "%s [WARNING] : " % current_time + input
+        sys.stdout.write(msg)
+
+        return msg
 
     @staticmethod
     def error(input):
@@ -27,7 +33,10 @@ class Logger():
         now = datetime.now()
         current_time = now.strftime("%H:%M:%S")
 
-        print "%s [ERROR] : " % current_time + input
+        msg = "%s [ERROR] : " % current_time + input
+        sys.stdout.write(msg)
+
+        return msg
 
     @staticmethod
     def console_progress_bar(prefix, suffix, progress, length):

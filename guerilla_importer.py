@@ -3,7 +3,7 @@
 #import guerilla 
 import os, json, time, threading, socket, sys
 from PySide import QtGui
-from PySide.QtCore import QThread
+from PySide.QtCore import QThread, Signal
 
 #import guerilla_utils
 import quixel_utils
@@ -16,18 +16,17 @@ host, port = "127.0.0.1", 24981
 
 class MSToGuerillaWorker(QThread):
 
+    log = Signal(str)
+    status = Signal(str)
 
-    def __init__(self):
-        QThread.__init__(self)
-
-
-    def __del__(self):
-        self.wait()
+    def __init__(self, parent=None):
+        super(MSToGuerillaWorker, self).__init__(parent)
 
 
     def process_data(self, data):
     # Utility function to process the array given by the MS importer
-        Logger.message("Processing data")
+        msg = Logger.message("Processing data")
+        self.log.emit(msg)
         json_data = json.loads(data)
         imported_assets = []
 
@@ -59,20 +58,26 @@ class MSToGuerillaWorker(QThread):
         # whether it's geometry or a surface
         processed_data = self.process_data(data)
         
-        for item in processed_data : Logger.message("Processed %s" % item["Name"])
+        for item in processed_data: 
+            msg = Logger.message("Processed %s" % item["Name"])
+            self.log.emit(msg)
 
-        Logger.message("Proceeding to Guerilla import")
+        msg = Logger.message("Proceeding to Guerilla import")
+        self.log.emit(msg)
 
         # TODO import in guerilla
         
-        Logger.message("Restarting Bridge server")
+        msg = Logger.message("Restarting Bridge server")
+        self.log.emit(msg)
 
 
     def run(self):
         time.sleep(0.1)
 
         try:
-            Logger.message("Waiting for Bridge export")
+            msg = Logger.message("Waiting for Bridge export")
+            self.log.emit(msg)
+            
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.bind((host, port))
 
@@ -102,13 +107,3 @@ class MSToGuerillaWorker(QThread):
         except:
             pass
 
-
-class MSToGuerillaWindow():
-
-    def __init__(self):
-        
-        app = QtGui.QApplication.instance()
-        if app is None:
-            app = QtGui.QApplication(sys.argv)
-        thread = MSToGuerillaWorker()
-        thread.start()
