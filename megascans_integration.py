@@ -5,9 +5,9 @@ def __init__():
     pass
 
 
-sys.path.append("D:/Repos/MegascansToGuerilla/bridge_to_guerilla")
+sys.path.append("D:/Repos/MegascansToGuerilla")
 
 
-from shelf import Shelf
+from bridge_to_guerilla.shelf import Shelf
 
 Shelf()

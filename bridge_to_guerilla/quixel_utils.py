@@ -1,5 +1,6 @@
 import os, sys, json
-from logger import Logger
+
+from utils.logger import Logger
 
 
 def initialize_preferences(bridge_path, megascans_folder_path):

@@ -8,7 +8,8 @@ from PySide.QtCore import QThread, Signal
 #import guerilla_utils
 import quixel_utils
 
-from logger import Logger
+from utils.logger import Logger
+import utils.guerilla_utils as gu
 
 
 host, port = "127.0.0.1", 24981
@@ -45,15 +46,21 @@ class MSToGuerillaWorker():
         return imported_assets
         
       
-    def import_data(self, data):
+    def import_data(self, data, **kwargs):
         # Utility function to import the data in guerilla
         # whether it's geometry or a surface
         processed_data = self.process_data(data)
-        
-        for item in processed_data: 
-            msg = Logger.message("Processed %s" % item["Name"])
 
-        msg = Logger.message("Proceeding to Guerilla import")
+        log_func = kwargs.get("log", None)
+        
+        for item in processed_data:         
+            msg = Logger.message("Proceeding to Guerilla import")
+
+
+
+            msg = Logger.message("Imported %s" % item["Name"])
+
+            if log_func: log_func(msg)
 
         # TODO import in guerilla
         

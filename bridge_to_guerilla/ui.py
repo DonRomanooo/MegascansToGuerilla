@@ -3,7 +3,6 @@ from PySide.QtCore import QThread, QDataStream
 from PySide.QtNetwork import QTcpServer, QHostAddress
 import sys
 
-
 from guerilla_importer import MSToGuerillaWorker
 
 
@@ -39,11 +38,9 @@ class MSToGuerillaWindow(QtGui.QWidget):
         self.data = self.socket.readAll()
 
         worker = MSToGuerillaWorker()
-        worker.import_data(str(self.data))
+        worker.import_data(str(self.data), log=self.add_log)
         
         
-
-    
     def add_log(self, text):
         self.console_log.appendPlainText(text)
 
