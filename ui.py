@@ -1,9 +1,10 @@
 from PySide import QtGui, QtCore
-from PySide.QtCore import QThread
+from PySide.QtCore import QThread, QDataStream
+from PySide.QtNetwork import QTcpServer, QHostAddress
 import sys
 
 
-from guerilla_importer import MSToGuerillaWorker as Worker
+from guerilla_importer import MSToGuerillaWorker
 
 
 class MSToGuerillaWindow(QtGui.QWidget):
@@ -23,21 +24,24 @@ class MSToGuerillaWindow(QtGui.QWidget):
         layout.addWidget(self.status_label)
         layout.addWidget(self.console_log)
 
-        self.update_thread()
+        self.__socket = QTcpServer()
+        self.__socket.listen(QHostAddress("localhost"), 24981)
+
+        self.__socket.newConnection.connect(self.on_new_connection)
+
+
+    def on_new_connection(self):
+        self.socket = self.__socket.nextPendingConnection()
+        self.socket.readyRead.connect(self.on_ready_read)
+
+
+    def on_ready_read(self):
+        self.data = self.socket.readAll()
+
+        worker = MSToGuerillaWorker()
+        worker.import_data(str(self.data))
         
-
-    def update_thread(self):
-        self.worker = Worker()
         
-        self.worker.status.connect(self.update_status, QtCore.Qt.QueuedConnection)
-        self.worker.log.connect(self.add_log, QtCore.Qt.QueuedConnection)
-
-        if not self.worker.isRunning():
-            self.worker.start()
-
-
-    def update_status(self, text):
-        self.status_label.setText("Status : " + text)
 
     
     def add_log(self, text):
@@ -45,19 +49,4 @@ class MSToGuerillaWindow(QtGui.QWidget):
 
         scrollbar = self.console_log.verticalScrollBar()
         scrollbar.setValue(scrollbar.maximum())
-
-
-def launch():
-
-    app = QtGui.QApplication.instance()
-
-    if app is None:
-        app = QtGui.QApplication(sys.argv)
-
-    win = MSToGuerillaWindow()
-    win.show()
-
-    app.exec_()
-
-launch()
 

@@ -14,20 +14,11 @@ from logger import Logger
 host, port = "127.0.0.1", 24981
 
 
-class MSToGuerillaWorker(QThread):
-
-    log = Signal(str)
-    status = Signal(str)
-
-    def __init__(self, parent=None):
-        super(MSToGuerillaWorker, self).__init__(parent)
-        self.status.emit("Inactive")
-
+class MSToGuerillaWorker():
 
     def process_data(self, data):
     # Utility function to process the array given by the MS importer
         msg = Logger.message("Processing data")
-        self.log.emit(msg)
         json_data = json.loads(data)
         imported_assets = []
 
@@ -53,7 +44,7 @@ class MSToGuerillaWorker(QThread):
 
         return imported_assets
         
-
+      
     def import_data(self, data):
         # Utility function to import the data in guerilla
         # whether it's geometry or a surface
@@ -61,54 +52,9 @@ class MSToGuerillaWorker(QThread):
         
         for item in processed_data: 
             msg = Logger.message("Processed %s" % item["Name"])
-            self.log.emit(msg)
 
         msg = Logger.message("Proceeding to Guerilla import")
-        self.log.emit(msg)
 
         # TODO import in guerilla
         
         msg = Logger.message("Restarting Bridge server")
-        self.log.emit(msg)
-
-
-    def run(self):
-        time.sleep(0.1)
-
-        try:
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.bind((host, port))
-
-            while True:
-                msg = Logger.message("Waiting for Bridge export")
-                self.log.emit(msg)
-                
-                self.status.emit("Active")
-
-                sock.listen(5)
-                client, addr = sock.accept()
-                data = ""
-                size = 4096*2
-                data = client.recv(size)
-
-                if data != "":
-                    msg = Logger.message("Receiving data")
-                    self.log.emit(msg)
-                    self.TotalData = b""
-                    self.TotalData += data
-
-                    while True:
-                        data = client.recv(4096*2)
-
-                        if data : self.TotalData += data
-                        else: break
-
-                    msg = Logger.message("Received data")
-                    self.log.emit(msg)
-                    self.import_data(self.TotalData)
-                    self.finished.emit()
-                    # break
-
-        except:
-            pass
-
